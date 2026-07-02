@@ -48,6 +48,12 @@ services:
       - source: grafana_config
         target: /etc/grafana/provisioning/datasources/datasources.yml
 
+      - source: grafana_dashboard
+        target: /etc/grafana/provisioning/dashboards/dashboard.json
+
+      - source: grafana_dashboard_provider
+        target: /etc/grafana/provisioning/dashboards/dashboard-provider.yml
+
     restart: unless-stopped
 
 configs:
@@ -56,3 +62,9 @@ configs:
 
   grafana_config:
     file: ./configs/datasource.yml
+
+  grafana_dashboard:
+    file: ./configs/dashboard.json
+
+  grafana_dashboard_provider:
+    file: ./configs/dashboard-provider.yml
