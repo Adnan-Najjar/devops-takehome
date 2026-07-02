@@ -14,3 +14,45 @@ services:
 
     restart: unless-stopped
 
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    environment:
+      - DATA_SOURCE_URI="postgres:5432/postgres?sslmode=disable"
+      - DATA_SOURCE_USER=${POSTGRES_USER}
+      - DATA_SOURCE_PASS=${POSTGRES_PASSWORD}
+    ports:
+      - "9187:9187"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+
+    configs:
+      - source: prometheus_exporter_config
+        target: /etc/prometheus/prometheus.yml
+
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    ports:
+      - "3000:3000"
+    configs:
+      - source: grafana_config
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+
+    restart: unless-stopped
+
+configs:
+  prometheus_exporter_config:
+    file: ./configs/prometheus.yml
+
+  grafana_config:
+    file: ./configs/datasource.yml
